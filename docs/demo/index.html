@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CULPRIT — three-stage finding</title>
+<style>
+body{font:16px/1.5 system-ui;max-width:980px;margin:3rem auto;padding:0 1rem;color:#19212b}
+.stage{border-left:5px solid #8b1e2d;padding:1rem 1.4rem;margin:1.5rem 0;background:#f7f8fa}
+.verdict{font-weight:800;color:#8b1e2d} table{border-collapse:collapse;width:100%}
+th,td{padding:.45rem;border-bottom:1px solid #ddd;text-align:left} code{font-size:.85rem}
+</style></head><body>
+<p>CULPRIT / deterministic tabletop investigation</p>
+<h1>One failure, three evidenced verdicts</h1>
+<section class="stage"><h2>1 · Component</h2>
+<p class="verdict">perception.detector</p>
+<p>Confidence 100%; decisive frame 7
+at t=0.7s, found in 4 replays.</p>
+<p>Ruled out: control.controller, planning.planner</p>
+<table><thead><tr><th>Substitution</th><th>Successes</th><th>Outcome flips</th></tr></thead>
+<tbody><tr><td>perception.detector</td><td>10/10</td><td>100%</td></tr>
+<tr><td>control.controller</td><td>0/10</td><td>0%</td></tr>
+<tr><td>planning.planner</td><td>0/10</td><td>0%</td></tr></tbody></table></section>
+<section class="stage"><h2>2 · Checkpoint</h2>
+<p class="verdict">ckpt-3 → ckpt-4</p>
+<p>Rollback confirmed: true.
+Binary-search evaluations: 2. Regression set:
+38 cases; controls: 8.</p></section>
+<section class="stage"><h2>3 · Data</h2>
+<p class="verdict">DATA_COMPOSITION</p><p>depleted low-light training share matches the regression-set slice</p>
+<p>Low-light share:
+4.1% →
+0.7%; regression set
+81.6% low-light.</p></section>
+<h2>Scope</h2>
+<p>This report is generated from a synthetic deterministic fixture. Raw MCAP,
+Who&amp;When, public checkpoint, and tier-3 TDA claims are not made. See
+LIMITS.md.</p>
+</body></html>

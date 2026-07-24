@@ -1,0 +1,31 @@
+{
+  "fixture": "tabletop-low-light-v1",
+  "results": {
+    "control.controller": {
+      "actor": "control.controller",
+      "baseline_success": false,
+      "flip_rate": 0.0,
+      "outcome_flips": 0,
+      "seeds": 100,
+      "successes": 0
+    },
+    "perception.detector": {
+      "actor": "perception.detector",
+      "baseline_success": false,
+      "flip_rate": 1.0,
+      "outcome_flips": 100,
+      "seeds": 100,
+      "successes": 100
+    },
+    "planning.planner": {
+      "actor": "planning.planner",
+      "baseline_success": false,
+      "flip_rate": 0.0,
+      "outcome_flips": 0,
+      "seeds": 100,
+      "successes": 0
+    }
+  },
+  "scope": "deterministic fixture; not a production reproducibility estimate",
+  "seeds": 100
+}

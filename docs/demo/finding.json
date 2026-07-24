@@ -1,0 +1,293 @@
+{
+  "checkpoint": {
+    "control_count": 8,
+    "current": "ckpt-4",
+    "evaluations": 2,
+    "previous": "ckpt-3",
+    "probe_count": 46,
+    "regression_set": [
+      {
+        "control": false,
+        "probe_id": "probe-00",
+        "slice": "low_light"
+      },
+      {
+        "control": false,
+        "probe_id": "probe-01",
+        "slice": "low_light"
+      },
+      {
+        "control": false,
+        "probe_id": "probe-02",
+        "slice": "low_light"
+      },
+      {
+        "control": false,
+        "probe_id": "probe-03",
+        "slice": "low_light"
+      },
+      {
+        "control": false,
+        "probe_id": "probe-04",
+        "slice": "low_light"
+      },
+      {
+        "control": false,
+        "probe_id": "probe-05",
+        "slice": "low_light"
+      },
+      {
+        "control": false,
+        "probe_id": "probe-06",
+        "slice": "low_light"
+      },
+      {
+        "control": false,
+        "probe_id": "probe-07",
+        "slice": "low_light"
+      },
+      {
+        "control": false,
+        "probe_id": "probe-08",
+        "slice": "low_light"
+      },
+      {
+        "control": false,
+        "probe_id": "probe-09",
+        "slice": "low_light"
+      },
+      {
+        "control": false,
+        "probe_id": "probe-10",
+        "slice": "low_light"
+      },
+      {
+        "control": false,
+        "probe_id": "probe-11",
+        "slice": "low_light"
+      },
+      {
+        "control": false,
+        "probe_id": "probe-12",
+        "slice": "low_light"
+      },
+      {
+        "control": false,
+        "probe_id": "probe-13",
+        "slice": "low_light"
+      },
+      {
+        "control": false,
+        "probe_id": "probe-14",
+        "slice": "low_light"
+      },
+      {
+        "control": false,
+        "probe_id": "probe-15",
+        "slice": "low_light"
+      },
+      {
+        "control": false,
+        "probe_id": "probe-16",
+        "slice": "low_light"
+      },
+      {
+        "control": false,
+        "probe_id": "probe-17",
+        "slice": "low_light"
+      },
+      {
+        "control": false,
+        "probe_id": "probe-18",
+        "slice": "low_light"
+      },
+      {
+        "control": false,
+        "probe_id": "probe-19",
+        "slice": "low_light"
+      },
+      {
+        "control": false,
+        "probe_id": "probe-20",
+        "slice": "low_light"
+      },
+      {
+        "control": false,
+        "probe_id": "probe-21",
+        "slice": "low_light"
+      },
+      {
+        "control": false,
+        "probe_id": "probe-22",
+        "slice": "low_light"
+      },
+      {
+        "control": false,
+        "probe_id": "probe-23",
+        "slice": "low_light"
+      },
+      {
+        "control": false,
+        "probe_id": "probe-24",
+        "slice": "low_light"
+      },
+      {
+        "control": false,
+        "probe_id": "probe-25",
+        "slice": "low_light"
+      },
+      {
+        "control": false,
+        "probe_id": "probe-26",
+        "slice": "low_light"
+      },
+      {
+        "control": false,
+        "probe_id": "probe-27",
+        "slice": "low_light"
+      },
+      {
+        "control": false,
+        "probe_id": "probe-28",
+        "slice": "low_light"
+      },
+      {
+        "control": false,
+        "probe_id": "probe-29",
+        "slice": "low_light"
+      },
+      {
+        "control": false,
+        "probe_id": "probe-30",
+        "slice": "low_light"
+      },
+      {
+        "control": false,
+        "probe_id": "probe-31",
+        "slice": "backlit"
+      },
+      {
+        "control": false,
+        "probe_id": "probe-32",
+        "slice": "backlit"
+      },
+      {
+        "control": false,
+        "probe_id": "probe-33",
+        "slice": "backlit"
+      },
+      {
+        "control": false,
+        "probe_id": "probe-34",
+        "slice": "backlit"
+      },
+      {
+        "control": false,
+        "probe_id": "probe-35",
+        "slice": "backlit"
+      },
+      {
+        "control": false,
+        "probe_id": "probe-36",
+        "slice": "backlit"
+      },
+      {
+        "control": false,
+        "probe_id": "probe-37",
+        "slice": "backlit"
+      }
+    ],
+    "rollback_confirmed": true,
+    "verdict": "REGRESSION_FOUND"
+  },
+  "component": {
+    "component": "perception.detector",
+    "confidence": 1.0,
+    "counterfactuals": [
+      {
+        "actor": "perception.detector",
+        "baseline_success": false,
+        "flip_rate": 1.0,
+        "outcome_flips": 10,
+        "seeds": 10,
+        "successes": 10
+      },
+      {
+        "actor": "control.controller",
+        "baseline_success": false,
+        "flip_rate": 0.0,
+        "outcome_flips": 0,
+        "seeds": 10,
+        "successes": 0
+      },
+      {
+        "actor": "planning.planner",
+        "baseline_success": false,
+        "flip_rate": 0.0,
+        "outcome_flips": 0,
+        "seeds": 10,
+        "successes": 0
+      }
+    ],
+    "reason": "oracle substitution reproducibly flipped the task outcome",
+    "ruled_out": [
+      "control.controller",
+      "planning.planner"
+    ],
+    "scan": [
+      {
+        "actor": "perception.detector",
+        "compared": 12,
+        "deviations": 1,
+        "frames": [
+          7
+        ],
+        "oracle_mode": "ground_truth",
+        "score": 0.08333333333333333
+      },
+      {
+        "actor": "control.controller",
+        "compared": 12,
+        "deviations": 0,
+        "frames": [],
+        "oracle_mode": "consistency",
+        "score": 0.0
+      },
+      {
+        "actor": "planning.planner",
+        "compared": 12,
+        "deviations": 0,
+        "frames": [],
+        "oracle_mode": "consistency",
+        "score": 0.0
+      }
+    ],
+    "verdict": "ATTRIBUTED"
+  },
+  "data": {
+    "manifest_diff": {
+      "current_hash": "sha256:4aab2c1568bfb1827989802259ef41d4c8620cb9f1ff62e8b3a4387d09c1c225",
+      "current_low_light_share": 0.007,
+      "previous_hash": "sha256:e8e05256f8710ef43dabe96a1010de1aaf5601a6ed3e1905e2257f618a15bca4",
+      "previous_low_light_share": 0.041,
+      "regression_set_low_light_share": 0.8157894736842105
+    },
+    "reason": "depleted low-light training share matches the regression-set slice",
+    "tier": 2,
+    "verdict": "DATA_COMPOSITION"
+  },
+  "decisive_step": {
+    "complexity_bound": 4,
+    "frame": 7,
+    "replays": 4,
+    "timestamp": 0.7,
+    "verdict": "ATTRIBUTED"
+  },
+  "fixture": "tabletop-low-light-v1",
+  "limits": {
+    "external_benchmark": false,
+    "raw_mcap": false,
+    "tier3_tda": false
+  },
+  "schema": "culprit-finding-v1"
+}

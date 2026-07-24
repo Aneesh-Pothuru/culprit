@@ -1,0 +1,6 @@
+{
+  "cases": 8,
+  "fixture": "generated-tabletop-faults-v1",
+  "responsible_component_accuracy": 1.0,
+  "scope": "internal deterministic regression suite; not Who&When or an external benchmark"
+}

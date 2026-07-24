@@ -1,0 +1,25 @@
+{
+  "format": "loopkit-trace-v1",
+  "events": [
+    {
+      "timestamp": 0.7,
+      "actor": "perception.detector",
+      "output": false,
+      "reference": true,
+      "metadata": {"scene": {"lighting": "low", "object_present": true}}
+    },
+    {
+      "timestamp": 0.7,
+      "actor": "planning.planner",
+      "output": "hold",
+      "reference": "hold"
+    },
+    {
+      "timestamp": 0.7,
+      "actor": "control.controller",
+      "output": "hold",
+      "reference": "hold"
+    }
+  ]
+}
+

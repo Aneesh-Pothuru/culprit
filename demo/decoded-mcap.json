@@ -1,0 +1,25 @@
+{
+  "format": "decoded-mcap-envelope-v1",
+  "messages": [
+    {
+      "log_time": 0.7,
+      "actor": "perception.detector",
+      "payload": {
+        "output": false,
+        "reference": true,
+        "scene": {"lighting": "low", "object_present": true}
+      }
+    },
+    {
+      "log_time": 0.7,
+      "actor": "planning.planner",
+      "payload": {"output": "hold", "reference": "hold"}
+    },
+    {
+      "log_time": 0.7,
+      "actor": "control.controller",
+      "payload": {"output": "hold", "reference": "hold"}
+    }
+  ]
+}
+

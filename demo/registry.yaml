@@ -1,0 +1,44 @@
+{
+  "schema": "culprit-checkpoint-registry-v1",
+  "components": {
+    "perception.detector": {
+      "checkpoints": [
+        {
+          "id": "ckpt-1",
+          "training_manifest_hash": "sha256:f8fa7d9f506db6f055232edd8d7a1d43c0f7d981c7e415746ccabee59b4add0c",
+          "config_hash": "sha256:config-a",
+          "eval_scores": {"low_light_recall": 0.96},
+          "behavior": {"adverse_light_recall": 0.96}
+        },
+        {
+          "id": "ckpt-2",
+          "training_manifest_hash": "sha256:1e8c6e60eb9c76b5d86a85da3f9a38c5a4d8dbf695c3f405ad6b9a9a8a07b436",
+          "config_hash": "sha256:config-a",
+          "eval_scores": {"low_light_recall": 0.94},
+          "behavior": {"adverse_light_recall": 0.94}
+        },
+        {
+          "id": "ckpt-3",
+          "training_manifest_hash": "sha256:e8e05256f8710ef43dabe96a1010de1aaf5601a6ed3e1905e2257f618a15bca4",
+          "config_hash": "sha256:config-a",
+          "eval_scores": {"low_light_recall": 0.93},
+          "behavior": {"adverse_light_recall": 0.93}
+        },
+        {
+          "id": "ckpt-4",
+          "training_manifest_hash": "sha256:4aab2c1568bfb1827989802259ef41d4c8620cb9f1ff62e8b3a4387d09c1c225",
+          "config_hash": "sha256:config-a",
+          "eval_scores": {"low_light_recall": 0.22},
+          "behavior": {"adverse_light_recall": 0.22}
+        },
+        {
+          "id": "ckpt-5",
+          "training_manifest_hash": "sha256:04382f14691d57e50fbb2ef80fb2d9e9c2ec9df4aa85c95661f9411c1b9b779f",
+          "config_hash": "sha256:config-a",
+          "eval_scores": {"low_light_recall": 0.19},
+          "behavior": {"adverse_light_recall": 0.19}
+        }
+      ]
+    }
+  }
+}

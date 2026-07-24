@@ -1,0 +1,11 @@
+{
+  "schema": "training-manifest-v1",
+  "dataset": "tabletop-training",
+  "sample_count": 1000,
+  "slices": {
+    "daylight": 950,
+    "low_light": 50
+  },
+  "verified_label_errors": 0
+}
+
