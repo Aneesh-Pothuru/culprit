@@ -28,6 +28,8 @@ checkpoints. Checkpoint 4 drops the low-light training slice. The run:
 4. renders one three-verdict report at
    [`docs/demo/index.html`](docs/demo/index.html).
 
+![CULPRIT component-to-data finding report](docs/assets/demo.jpg)
+
 The Makefile also executes the brief's live CPU command:
 
 ```bash
@@ -63,4 +65,3 @@ manifest diff ← data auditor ← checkpoint bisection + generated probes
                                               ↓
                                   JSON + static HTML finding
 ```
-
