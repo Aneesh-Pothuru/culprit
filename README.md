@@ -10,6 +10,27 @@ ships a compact full-descent P0 reference implementation. It does not claim
 production robotics or external-benchmark performance; see
 [`LIMITS.md`](LIMITS.md).
 
+## Product site and reconstruction workbench
+
+The GitHub Pages surface is a complete product briefing rather than a redirect
+to the generated report:
+
+- [`docs/index.html`](docs/index.html) explains the problem, causal thesis,
+  proof fixture, mechanism, architecture, and limits.
+- [`docs/app/index.html`](docs/app/index.html) is a deterministic interactive
+  reconstruction room with synchronized playback, timeline scrubbing,
+  component interventions, outcome-flip trials, checkpoint bisection,
+  training-slice audit, payload inspection, and finding export.
+- [`docs/demo/index.html`](docs/demo/index.html) remains the report generated
+  by the Python engine.
+- [`docs/USER_JOURNEYS.md`](docs/USER_JOURNEYS.md) maps attributed and
+  unattributed paths for incident response, robotics, model, and data owners.
+
+The browser workbench uses embedded fixture data so it remains keyless and
+works on static hosting. It does not pretend to run an external robot or agent.
+Run `make demo` to regenerate the authoritative finding from the Python
+implementation.
+
 ## Journey 0
 
 ```bash

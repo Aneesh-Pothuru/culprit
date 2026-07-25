@@ -2,12 +2,294 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta http-equiv="refresh" content="0; url=demo/">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>CULPRIT demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="CULPRIT is a deterministic forensic workbench for locating the component, checkpoint, and training-data change behind a multi-model system failure.">
+  <meta name="theme-color" content="#11100e">
+  <title>CULPRIT — reconstruct the failure</title>
+  <link rel="stylesheet" href="site.css">
 </head>
 <body>
-  <p><a href="demo/">Open the CULPRIT three-stage finding</a>.</p>
+  <a class="skip-link" href="#content">Skip to content</a>
+  <header class="site-header">
+    <a class="wordmark" href="./" aria-label="CULPRIT home">
+      <span class="wordmark-stamp" aria-hidden="true">C</span>
+      <span>CULPRIT</span>
+      <small>MODEL-STACK FORENSICS</small>
+    </a>
+    <nav class="site-nav" aria-label="Primary navigation">
+      <a href="#thesis">Thesis</a>
+      <a href="#evidence">Evidence</a>
+      <a href="#mechanism">Method</a>
+      <a href="#about">About</a>
+    </nav>
+    <a class="header-action" href="app/">Open case <span aria-hidden="true">↗</span></a>
+  </header>
+
+  <main id="content">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="case-spine" aria-hidden="true">
+        <span>CASE // 004</span>
+        <i></i>
+        <span>00:00:00.700</span>
+      </div>
+      <div class="hero-copy">
+        <p class="kicker">The debugging agent for multi-model systems</p>
+        <h1 id="hero-title">Reconstruct the failure.<br><em>Put the culprit on record.</em></h1>
+        <p class="hero-lede">CULPRIT does not ask a model to read logs and guess. It re-runs the system, changes one component at a time, and follows the evidence from symptom to component, checkpoint, and training data.</p>
+        <div class="hero-actions">
+          <a class="button button-primary" href="app/">Investigate incident 004</a>
+          <a class="text-link" href="#evidence">Review the evidence <span aria-hidden="true">↓</span></a>
+        </div>
+        <dl class="hero-facts" aria-label="Fixture facts">
+          <div><dt>Decisive moment</dt><dd>Frame 7 · 0.7s</dd></div>
+          <div><dt>Proven actor</dt><dd>perception.detector</dd></div>
+          <div><dt>Boundary</dt><dd>ckpt-3 → ckpt-4</dd></div>
+        </dl>
+      </div>
+
+      <div class="hero-reconstruction" aria-label="Stylized incident reconstruction">
+        <div class="recon-meta">
+          <span>CAM/WRIST-01</span>
+          <span>MONO · 10 FPS</span>
+        </div>
+        <div class="recon-field">
+          <div class="scanlines" aria-hidden="true"></div>
+          <div class="table-plane" aria-hidden="true"></div>
+          <div class="robot-arm" aria-hidden="true"><i></i><b></b></div>
+          <div class="target-object" aria-hidden="true"></div>
+          <div class="reference-box" aria-hidden="true"></div>
+          <div class="grease-note" aria-hidden="true">MISS<br>DETECT</div>
+          <div class="crosshair" aria-hidden="true"></div>
+          <div class="recon-time">TC 00:00:00:700</div>
+        </div>
+        <div class="filmstrip" aria-label="Frames 4 through 9, anomaly at frame 7">
+          <span>04</span><span>05</span><span>06</span><span class="is-fault">07</span><span>08</span><span>09</span>
+        </div>
+        <div class="evidence-seal" aria-label="Outcome flip proven across ten of ten seeds">
+          <strong>10/10</strong>
+          <span>OUTCOME FLIPS</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="thesis-section" id="thesis" aria-labelledby="thesis-title">
+      <header class="section-intro">
+        <p class="folio">01 / THE CASE</p>
+        <h2 id="thesis-title">A wrong output is a symptom.<br>A cause survives intervention.</h2>
+        <p>Robots and agent systems are model stacks. A downstream planner may look wrong because perception gave it the wrong world. CULPRIT separates sequence from cause by replaying the same run with one output replaced by an oracle reference.</p>
+      </header>
+      <div class="problem-ledger">
+        <article>
+          <span class="ledger-no">01</span>
+          <h3>Logs show order</h3>
+          <p>A trace can show which call came first. It cannot prove which output made the final outcome fail.</p>
+          <small>OBSERVATION</small>
+        </article>
+        <article>
+          <span class="ledger-no">02</span>
+          <h3>Replay tests cause</h3>
+          <p>Substitute the detector reference, re-run planner and controller, and observe whether the task outcome changes.</p>
+          <small>INTERVENTION</small>
+        </article>
+        <article>
+          <span class="ledger-no">03</span>
+          <h3>Descent explains why</h3>
+          <p>Bisect the implicated model history, confirm rollback, then compare the exact training manifests at the boundary.</p>
+          <small>ATTRIBUTION</small>
+        </article>
+      </div>
+    </section>
+
+    <section class="evidence-section" id="evidence" aria-labelledby="evidence-title">
+      <div class="evidence-header">
+        <div>
+          <p class="folio folio-light">02 / EXHIBIT A</p>
+          <h2 id="evidence-title">One fixture.<br>Three evidenced verdicts.</h2>
+        </div>
+        <p>The shipped CPU reference harness creates twelve frames, one low-light failure, five detector checkpoints, and a known training-manifest change. Every number below is regenerated by the Python implementation.</p>
+      </div>
+
+      <div class="causal-plate">
+        <article class="causal-node node-component">
+          <div class="node-index">A</div>
+          <p class="node-label">Responsible component</p>
+          <h3>perception.<br>detector</h3>
+          <div class="flip-comparison" aria-label="Counterfactual outcome flip rates">
+            <div><span>DETECTOR</span><i style="--value:100%"></i><strong>100%</strong></div>
+            <div><span>PLANNER</span><i style="--value:0%"></i><strong>0%</strong></div>
+            <div><span>CONTROL</span><i style="--value:0%"></i><strong>0%</strong></div>
+          </div>
+          <p class="node-proof">Oracle substitution flips the task outcome across 10/10 deterministic seeds.</p>
+        </article>
+        <div class="causal-link" aria-hidden="true"><span>descend</span></div>
+        <article class="causal-node node-checkpoint">
+          <div class="node-index">B</div>
+          <p class="node-label">Regressing transition</p>
+          <h3>ckpt-3 <em>→</em><br>ckpt-4</h3>
+          <div class="checkpoint-film" aria-label="Checkpoint pass fail history">
+            <span class="pass">1</span><span class="pass">2</span><span class="pass focus">3</span><span class="fail focus">4</span><span class="fail">5</span>
+          </div>
+          <p class="node-proof">Two binary-search evaluations, 38 failing probes, eight controls, rollback confirmed.</p>
+        </article>
+        <div class="causal-link" aria-hidden="true"><span>descend</span></div>
+        <article class="causal-node node-data">
+          <div class="node-index">C</div>
+          <p class="node-label">Training-data change</p>
+          <h3>DATA_<br>COMPOSITION</h3>
+          <div class="slice-comparison" aria-label="Low-light share comparison">
+            <div><span>CKPT-3</span><i style="--value:41%"></i><strong>4.1%</strong></div>
+            <div><span>CKPT-4</span><i style="--value:7%"></i><strong>0.7%</strong></div>
+            <div class="regression"><span>REGRESSION SET</span><i style="--value:82%"></i><strong>81.6%</strong></div>
+          </div>
+          <p class="node-proof">The depleted low-light slice matches the regression-set composition.</p>
+        </article>
+      </div>
+      <p class="evidence-caption"><strong>Evidence standard:</strong> correlation proposes a hypothesis. A deterministic outcome flip supports component attribution. A bounded pass-to-fail transition plus rollback supports checkpoint attribution. Manifest direction matching the regression slice supports a tier-2 data-composition finding.</p>
+    </section>
+
+    <section class="mechanism-section" id="mechanism" aria-labelledby="mechanism-title">
+      <header class="section-intro narrow">
+        <p class="folio">03 / METHOD</p>
+        <h2 id="mechanism-title">A controlled descent, not a generated explanation.</h2>
+      </header>
+      <ol class="method-timeline">
+        <li>
+          <time>00:00</time>
+          <div><h3>Normalize the run</h3><p>Agent traces and decoded MCAP-style envelopes become one actor-keyed timeline. The original evidence remains untouched.</p></div>
+          <span>INGEST</span>
+        </li>
+        <li>
+          <time>00:07</time>
+          <div><h3>Find the decisive moment</h3><p>A logarithmic replay search finds frame 7, the earliest substitution horizon that recovers the outcome.</p></div>
+          <span>BISECT TIME</span>
+        </li>
+        <li>
+          <time>00:18</time>
+          <div><h3>Intervene component by component</h3><p>Ground-truth detector output recovers the grasp. Planner and controller substitutions do not.</p></div>
+          <span>REPLAY × 10</span>
+        </li>
+        <li>
+          <time>00:31</time>
+          <div><h3>Bisect model history</h3><p>The probe set bounds the regression between ckpt-3 and ckpt-4 and confirms that rollback holds.</p></div>
+          <span>2 EVALUATIONS</span>
+        </li>
+        <li>
+          <time>00:44</time>
+          <div><h3>Audit the changed evidence</h3><p>Content-addressed manifests expose the low-light drop; the changed slice matches 31 of 38 regressions.</p></div>
+          <span>TIER 2</span>
+        </li>
+      </ol>
+      <a class="method-cta" href="app/">
+        <span>ENTER THE RECONSTRUCTION ROOM</span>
+        <strong>Run the intervention yourself</strong>
+        <i aria-hidden="true">↗</i>
+      </a>
+    </section>
+
+    <section class="paths-section" aria-labelledby="paths-title">
+      <header>
+        <p class="folio folio-light">04 / TWO HONEST ENDINGS</p>
+        <h2 id="paths-title">Evidence can name the culprit.<br>It can also refuse.</h2>
+      </header>
+      <div class="paths">
+        <article class="path-attributed">
+          <span>WHEN AN OUTCOME FLIPS</span>
+          <h3>ATTRIBUTED</h3>
+          <p>Name the component and decisive frame. Unlock checkpoint bisection. Descend into the manifest only after rollback is confirmed.</p>
+          <ul>
+            <li>Intervention recorded</li>
+            <li>Ruled-out actors retained</li>
+            <li>Confidence tied to repeatability</li>
+          </ul>
+        </article>
+        <article class="path-unattributed">
+          <span>WHEN NO TEST DISCRIMINATES</span>
+          <h3>UNATTRIBUTED</h3>
+          <p>Stop the descent. Preserve missing references and failed hypotheses. Export an unresolved finding instead of guessing.</p>
+          <ul>
+            <li>No synthetic confidence</li>
+            <li>Downstream claims remain locked</li>
+            <li>Next evidence request is explicit</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="architecture-section" aria-labelledby="architecture-title">
+      <div class="architecture-copy">
+        <p class="folio">05 / UNDER THE FLOOR</p>
+        <h2 id="architecture-title">A real reference harness beneath the interface.</h2>
+        <p>The workbench is a browser-side reconstruction of artifacts emitted by the dependency-free Python engine. The repository implements normalization, deviation ranking, component interventions, decisive-step bisection, checkpoint bisection, probe generation, rollback confirmation, and a tiered manifest audit.</p>
+        <a class="text-link dark-link" href="https://github.com/Aneesh-Pothuru/culprit">Inspect the repository <span aria-hidden="true">↗</span></a>
+      </div>
+      <div class="architecture-map" role="img" aria-label="Trace flows through replay, component attribution, checkpoint bisection, and data audit to a finding">
+        <div class="arch-source"><span>SOURCE</span><strong>trace + decoded envelope</strong></div>
+        <i aria-hidden="true"></i>
+        <div><span>REPLAY</span><strong>actor-keyed timeline</strong></div>
+        <i aria-hidden="true"></i>
+        <div><span>INTERVENE</span><strong>counterfactual trials</strong></div>
+        <i aria-hidden="true"></i>
+        <div><span>DESCEND</span><strong>checkpoint + manifest</strong></div>
+        <i aria-hidden="true"></i>
+        <div class="arch-output"><span>RECORD</span><strong>finding.json + HTML</strong></div>
+      </div>
+      <div class="command-block">
+        <span>JOURNEY 0 · KEYLESS · CPU ONLY</span>
+        <code><b>$</b> git clone https://github.com/Aneesh-Pothuru/culprit<br><b>$</b> cd culprit &amp;&amp; make demo</code>
+      </div>
+    </section>
+
+    <section class="about-section" id="about" aria-labelledby="about-title">
+      <div class="about-title">
+        <p class="folio">06 / ABOUT THE CLAIM</p>
+        <h2 id="about-title">What CULPRIT is—<br>and what v0.1 is not.</h2>
+      </div>
+      <div class="about-grid">
+        <article>
+          <h3>Implemented</h3>
+          <ul>
+            <li>Deterministic component → checkpoint → data descent</li>
+            <li>Normalized agent and decoded MCAP-style JSON traces</li>
+            <li>Multi-seed counterfactuals and honest abstention</li>
+            <li>Checkpoint probes, controls, rollback, and slice audit</li>
+          </ul>
+        </article>
+        <article>
+          <h3>Not claimed</h3>
+          <ul>
+            <li>No raw binary MCAP or ROS 2 runtime in the keyless path</li>
+            <li>No Who&amp;When or external benchmark measurement</li>
+            <li>No real trained PyTorch components in the toy stack</li>
+            <li>No tier-3 TRAK/TracIn or automatic repair</li>
+          </ul>
+        </article>
+        <article class="about-principle">
+          <span>OPERATING PRINCIPLE</span>
+          <blockquote>“If the intervention does not change the outcome, the interface does not name a culprit.”</blockquote>
+          <a href="demo/">Open the generated finding →</a>
+          <a href="https://github.com/Aneesh-Pothuru/culprit/blob/main/LIMITS.md">Read every limit →</a>
+        </article>
+      </div>
+    </section>
+
+    <section class="closing">
+      <span class="closing-code">CASE // READY</span>
+      <h2>Don’t read the postmortem.<br><em>Re-run the cause.</em></h2>
+      <a class="button button-primary" href="app/">Open the investigation workbench</a>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wordmark">
+      <span class="wordmark-stamp" aria-hidden="true">C</span>
+      <span>CULPRIT</span>
+    </div>
+    <p>Deterministic model-stack forensics · Synthetic reference fixture · v0.1</p>
+    <nav aria-label="Footer navigation">
+      <a href="app/">Workbench</a>
+      <a href="demo/">Generated finding</a>
+      <a href="https://github.com/Aneesh-Pothuru/culprit">GitHub</a>
+    </nav>
+  </footer>
 </body>
 </html>
-

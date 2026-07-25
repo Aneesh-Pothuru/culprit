@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Interactive CULPRIT model-stack reconstruction workbench.">
+  <meta name="theme-color" content="#0b0c0b">
+  <title>Incident 004 · CULPRIT reconstruction room</title>
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+  <a class="skip-link" href="#workspace">Skip to workbench</a>
+  <header class="app-header">
+    <a class="brand" href="../" aria-label="Return to CULPRIT briefing">
+      <span aria-hidden="true">C</span>
+      <strong>CULPRIT</strong>
+      <small>RECONSTRUCTION ROOM</small>
+    </a>
+    <div class="case-title">
+      <span id="caseId">CASE // 004</span>
+      <strong id="caseTitle">Tabletop low-light miss</strong>
+    </div>
+    <div class="header-status">
+      <span class="source-state"><i></i> LOCAL FIXTURE</span>
+      <button class="quiet-button" id="copyFinding" type="button">Copy finding</button>
+      <button class="export-button" id="exportFinding" type="button">Export JSON</button>
+    </div>
+  </header>
+
+  <main class="workspace" id="workspace">
+    <aside class="case-rail" aria-label="Case library and causal evidence">
+      <div class="rail-heading">
+        <span>CASE INDEX</span>
+        <strong>03 / LOCAL</strong>
+      </div>
+      <div class="case-list" id="caseList">
+        <button class="case-item is-active" type="button" data-case="incident-004">
+          <span class="case-number">004</span>
+          <span><strong>Low-light miss</strong><small>tabletop-low-light-v1</small></span>
+          <i class="status-mark attributed" aria-label="Attributed"></i>
+        </button>
+        <button class="case-item" type="button" data-case="incident-007">
+          <span class="case-number">007</span>
+          <span><strong>Reference gap</strong><small>oracle-limited-preview</small></span>
+          <i class="status-mark unresolved" aria-label="Unattributed"></i>
+        </button>
+        <button class="case-item" type="button" data-case="control-002">
+          <span class="case-number">C02</span>
+          <span><strong>Daylight control</strong><small>nominal-control</small></span>
+          <i class="status-mark nominal" aria-label="Nominal"></i>
+        </button>
+      </div>
+
+      <section class="evidence-tree-panel" aria-labelledby="treeTitle">
+        <div class="panel-title">
+          <span id="treeTitle">CAUSAL DESCENT</span>
+          <small id="treeStatus">3 LEVELS EVIDENCED</small>
+        </div>
+        <div class="evidence-tree" id="evidenceTree">
+          <button type="button" class="tree-node is-proven" data-inspect="component">
+            <span>A</span>
+            <i></i>
+            <strong>perception.detector</strong>
+            <small>10/10 outcome flips</small>
+          </button>
+          <div class="tree-connector"><i></i><span>CAUSE</span></div>
+          <button type="button" class="tree-node is-proven" data-inspect="checkpoint">
+            <span>B</span>
+            <i></i>
+            <strong>ckpt-3 → ckpt-4</strong>
+            <small>rollback confirmed</small>
+          </button>
+          <div class="tree-connector"><i></i><span>CAUSE</span></div>
+          <button type="button" class="tree-node is-proven" data-inspect="slices">
+            <span>C</span>
+            <i></i>
+            <strong>DATA_COMPOSITION</strong>
+            <small>low-light depleted</small>
+          </button>
+        </div>
+      </section>
+
+      <div class="scope-note">
+        <span>SCOPE // FIXTURE</span>
+        <p id="scopeText">Deterministic CPU toy stack. This case mirrors the checked-in Python artifact; it is not a production robotics claim.</p>
+        <a href="../demo/">Open generated report →</a>
+      </div>
+    </aside>
+
+    <section class="reconstruction" aria-labelledby="reconstructionTitle">
+      <header class="view-header">
+        <div>
+          <span>RECONSTRUCTION // CAM.WRIST.01</span>
+          <h1 id="reconstructionTitle">Spatial replay</h1>
+        </div>
+        <div class="view-readout">
+          <span>FRAME <strong id="frameReadout">07 / 11</strong></span>
+          <span>TC <strong id="timecodeReadout">00:00:00.700</strong></span>
+        </div>
+      </header>
+
+      <div class="scene-frame" id="sceneFrame">
+        <canvas id="sceneCanvas" aria-label="Monochrome tabletop reconstruction synchronized to the current frame"></canvas>
+        <div class="scene-grid" aria-hidden="true"></div>
+        <div class="scene-hud hud-top">
+          <span>REC ●</span>
+          <span>ISO 3200 · LOW-LIGHT</span>
+        </div>
+        <div class="scene-hud hud-bottom">
+          <span id="sceneExposure">EV −2.1</span>
+          <span id="sceneOutcome">TASK // FAILED</span>
+        </div>
+        <div class="grease-annotation" id="greaseAnnotation" aria-hidden="true">
+          <span>FIRST BAD<br>OBSERVATION</span>
+          <i></i>
+        </div>
+        <p class="sr-only" id="sceneDescription" aria-live="polite">Frame 7: target present in low light. Detector says false while reference says true. Planner and controller hold.</p>
+      </div>
+
+      <div class="signal-strip" aria-label="Synchronized component signals">
+        <div>
+          <span>DETECTOR.CONFIDENCE</span>
+          <strong id="detectorConfidence">0.12</strong>
+          <i class="signal-line detector-line" id="detectorLine"></i>
+        </div>
+        <div>
+          <span>PLANNER.COMMAND</span>
+          <strong id="plannerCommand">HOLD</strong>
+          <i class="signal-line planner-line" id="plannerLine"></i>
+        </div>
+        <div>
+          <span>CONTROLLER.STATE</span>
+          <strong id="controllerState">HOLD</strong>
+          <i class="signal-line control-line" id="controlLine"></i>
+        </div>
+      </div>
+
+      <section class="outcome-panel" aria-labelledby="outcomeTitle">
+        <header>
+          <div><span>EXHIBIT // OUTCOME FLIP</span><h2 id="outcomeTitle">Counterfactual evidence</h2></div>
+          <p id="outcomeSummary">Detector oracle recovers the grasp; downstream substitutions do not.</p>
+        </header>
+        <canvas id="outcomeGraph" aria-label="Outcome flip rate by component: detector 100 percent, planner 0 percent, controller 0 percent"></canvas>
+        <div class="graph-legend" id="graphLegend">
+          <span><i class="detector-key"></i> DETECTOR <strong>100%</strong></span>
+          <span><i class="planner-key"></i> PLANNER <strong>0%</strong></span>
+          <span><i class="control-key"></i> CONTROL <strong>0%</strong></span>
+        </div>
+      </section>
+    </section>
+
+    <aside class="analysis-rail" aria-label="Intervention and evidence inspector">
+      <section class="intervention-panel">
+        <div class="panel-title">
+          <span>INTERVENTION BAY</span>
+          <small>ONE VARIABLE AT A TIME</small>
+        </div>
+        <p>Replace one recorded output with its reference, then deterministically re-run every downstream component.</p>
+        <div class="component-toggles" id="componentToggles">
+          <button type="button" data-component="perception.detector" aria-pressed="true">
+            <span><i></i><strong>Detector oracle</strong><small>ground_truth</small></span>
+            <b></b>
+          </button>
+          <button type="button" data-component="planning.planner" aria-pressed="false">
+            <span><i></i><strong>Planner oracle</strong><small>consistency</small></span>
+            <b></b>
+          </button>
+          <button type="button" data-component="control.controller" aria-pressed="false">
+            <span><i></i><strong>Controller oracle</strong><small>consistency</small></span>
+            <b></b>
+          </button>
+        </div>
+        <button class="run-button" id="runReplay" type="button">
+          <span>Run counterfactual</span>
+          <small id="runHint">10 deterministic seeds</small>
+        </button>
+        <div class="replay-result" id="replayResult" aria-live="polite">
+          <span>LAST REPLAY</span>
+          <strong>OUTCOME FLIPPED · 10/10</strong>
+          <small>perception.detector reference applied</small>
+        </div>
+      </section>
+
+      <section class="bisection-panel" aria-labelledby="bisectionTitle">
+        <div class="panel-title">
+          <span id="bisectionTitle">CHECKPOINT BISECTION</span>
+          <small id="bisectionGate">ATTRIBUTION GATE PASSED</small>
+        </div>
+        <div class="checkpoint-track" id="checkpointTrack" aria-label="Five checkpoints; checkpoint 3 passes and checkpoint 4 fails">
+          <button type="button" data-checkpoint="ckpt-1"><span>1</span><small>inferred</small></button>
+          <button type="button" data-checkpoint="ckpt-2"><span>2</span><small>inferred</small></button>
+          <button type="button" class="boundary pass" data-checkpoint="ckpt-3"><span>3</span><small>pass</small></button>
+          <button type="button" class="boundary fail" data-checkpoint="ckpt-4"><span>4</span><small>fail</small></button>
+          <button type="button" data-checkpoint="ckpt-5"><span>5</span><small>inferred</small></button>
+        </div>
+        <button class="bisect-button" id="runBisection" type="button">Re-run bisection</button>
+        <div class="bisect-log" id="bisectLog" aria-live="polite">
+          <span><b>eval 01</b> ckpt-3 · PASS · narrow right</span>
+          <span><b>eval 02</b> ckpt-4 · FAIL · boundary found</span>
+        </div>
+      </section>
+
+      <section class="inspector-panel">
+        <div class="inspector-tabs" role="tablist" aria-label="Evidence inspector">
+          <button role="tab" type="button" id="tab-payload" aria-selected="true" aria-controls="panel-payload" data-tab="payload" tabindex="0">Payload</button>
+          <button role="tab" type="button" id="tab-slices" aria-selected="false" aria-controls="panel-slices" data-tab="slices" tabindex="-1">Slices</button>
+          <button role="tab" type="button" id="tab-record" aria-selected="false" aria-controls="panel-record" data-tab="record" tabindex="-1">Record</button>
+        </div>
+
+        <div class="tab-panel" id="panel-payload" role="tabpanel" aria-labelledby="tab-payload">
+          <div class="payload-heading">
+            <span id="payloadPath">/frames/7/perception.detector</span>
+            <button type="button" id="copyPayload">Copy</button>
+          </div>
+          <pre id="payloadInspector"><code>{
+  "frame": 7,
+  "timestamp": 0.7,
+  "scene": {
+    "lighting": "low",
+    "object_present": true
+  },
+  "output": false,
+  "reference": true
+}</code></pre>
+        </div>
+
+        <div class="tab-panel" id="panel-slices" role="tabpanel" aria-labelledby="tab-slices" hidden>
+          <div class="slice-audit" id="sliceAudit">
+            <div>
+              <span>CKPT-3 · LOW LIGHT</span>
+              <i><b style="--slice:41%"></b></i>
+              <strong>4.1%</strong>
+            </div>
+            <div>
+              <span>CKPT-4 · LOW LIGHT</span>
+              <i><b style="--slice:7%"></b></i>
+              <strong>0.7%</strong>
+            </div>
+            <div class="regression-slice">
+              <span>REGRESSION SET · LOW LIGHT</span>
+              <i><b style="--slice:81.6%"></b></i>
+              <strong>81.6%</strong>
+            </div>
+            <dl>
+              <div><dt>Previous manifest</dt><dd>sha256:e8e05256…</dd></div>
+              <div><dt>Current manifest</dt><dd>sha256:4aab2c15…</dd></div>
+              <div><dt>Config hash</dt><dd>unchanged</dd></div>
+              <div><dt>Tier-3 TDA</dt><dd>not available</dd></div>
+            </dl>
+          </div>
+        </div>
+
+        <div class="tab-panel" id="panel-record" role="tabpanel" aria-labelledby="tab-record" hidden>
+          <dl class="record-list" id="recordList">
+            <div><dt>Finding schema</dt><dd>culprit-finding-v1</dd></div>
+            <div><dt>Determinism</dt><dd>1.00</dd></div>
+            <div><dt>Decisive step</dt><dd>frame 7 · 0.7s</dd></div>
+            <div><dt>Probe set</dt><dd>46 probes · 8 controls</dd></div>
+            <div><dt>Cause class</dt><dd>DATA_COMPOSITION</dd></div>
+          </dl>
+          <p class="record-limit">This browser demo replays embedded deterministic data. The Python engine in the repository creates the source finding. No external agent, robot, or model is running here.</p>
+        </div>
+      </section>
+    </aside>
+
+    <section class="timecode-dock" aria-label="Replay controls and synchronized timeline">
+      <div class="transport">
+        <button type="button" id="resetPlayback" aria-label="Reset replay">↺</button>
+        <button type="button" id="previousFrame" aria-label="Previous frame">|◀</button>
+        <button class="play-button" type="button" id="togglePlayback" aria-label="Play replay" aria-pressed="false">▶</button>
+        <button type="button" id="nextFrame" aria-label="Next frame">▶|</button>
+      </div>
+      <div class="timecode">
+        <span id="dockTimecode">00:00:00.700</span>
+        <small>/ 00:00:01.100</small>
+      </div>
+      <div class="timeline">
+        <div class="timeline-labels"><span>FRAME 00</span><span>FRAME 11</span></div>
+        <div class="event-markers" id="eventMarkers" aria-hidden="true">
+          <i class="event ingest" style="--position:0%"></i>
+          <i class="event warning" style="--position:63.64%"></i>
+          <i class="event outcome" style="--position:100%"></i>
+        </div>
+        <input id="timelineScrubber" type="range" min="0" max="11" value="7" step="1" aria-label="Current replay frame">
+        <div class="timeline-key">
+          <span><i class="ingest"></i> start</span>
+          <span><i class="warning"></i> anomaly</span>
+          <span><i class="outcome"></i> outcome</span>
+        </div>
+      </div>
+      <div class="playback-rate">
+        <span>RATE</span>
+        <button type="button" id="playbackRate">1×</button>
+      </div>
+    </section>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+</body>
+</html>
