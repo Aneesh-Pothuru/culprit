@@ -1,0 +1,20 @@
+services:
+  culprit:
+    build: .
+    environment:
+      CULPRIT_API_TOKEN: ${CULPRIT_API_TOKEN:?Set CULPRIT_API_TOKEN before starting the container}
+    ports:
+      - "127.0.0.1:8765:8765"
+    volumes:
+      - culprit-data:/var/lib/culprit
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    restart: unless-stopped
+
+volumes:
+  culprit-data:

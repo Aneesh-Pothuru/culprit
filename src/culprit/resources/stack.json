@@ -1,0 +1,28 @@
+{
+  "schema": "culprit-stack-v1",
+  "name": "tabletop-v1",
+  "determinism_score": 1.0,
+  "components": [
+    {
+      "actor": "perception.detector",
+      "input_key": "camera.frame",
+      "output_key": "detections.object_present",
+      "oracle_mode": "ground_truth",
+      "deterministic": true
+    },
+    {
+      "actor": "planning.planner",
+      "input_key": "detections.object_present",
+      "output_key": "plan.command",
+      "oracle_mode": "consistency",
+      "deterministic": true
+    },
+    {
+      "actor": "control.controller",
+      "input_key": "plan.command",
+      "output_key": "control.command",
+      "oracle_mode": "consistency",
+      "deterministic": true
+    }
+  ]
+}

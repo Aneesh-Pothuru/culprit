@@ -5,7 +5,7 @@ import json
 import math
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any, Iterable, Mapping
 
 from .schemas.loopkit import TraceEvent, Verdict
 
@@ -51,19 +51,26 @@ def load_json_yaml(path: Path) -> dict[str, Any]:
         ) from exc
 
 
-def load_stack(path: Path) -> StackManifest:
-    raw = load_json_yaml(path)
+def load_stack_data(raw: Mapping[str, Any]) -> StackManifest:
+    if raw.get("schema") not in (None, "culprit-stack-v1"):
+        raise ValueError("unsupported stack manifest schema")
+    if not isinstance(raw.get("components"), list) or not raw["components"]:
+        raise ValueError("stack manifest must declare at least one component")
     components = tuple(Component(**item) for item in raw["components"])
     actors = [item.actor for item in components]
     if len(actors) != len(set(actors)):
         raise ValueError("component actor names must be unique")
-    if not 0.0 <= raw["determinism_score"] <= 1.0:
+    if not 0.0 <= float(raw["determinism_score"]) <= 1.0:
         raise ValueError("determinism_score must be in [0, 1]")
     return StackManifest(
-        name=raw["name"],
+        name=str(raw["name"]),
         components=components,
         determinism_score=float(raw["determinism_score"]),
     )
+
+
+def load_stack(path: Path) -> StackManifest:
+    return load_stack_data(load_json_yaml(path))
 
 
 def normalize_events(events: Iterable[TraceEvent]) -> tuple[Frame, ...]:
@@ -85,20 +92,28 @@ def normalize_events(events: Iterable[TraceEvent]) -> tuple[Frame, ...]:
     return tuple(frames)
 
 
-def ingest_agent_trace(path: Path) -> tuple[Frame, ...]:
-    raw = json.loads(path.read_text())
+def ingest_agent_trace_data(raw: Mapping[str, Any]) -> tuple[Frame, ...]:
     if raw.get("format") != "loopkit-trace-v1":
         raise ValueError("unsupported agent trace format")
-    return normalize_events(TraceEvent(**event) for event in raw["events"])
+    events = raw.get("events")
+    if not isinstance(events, list) or not events:
+        raise ValueError("agent trace must contain at least one event")
+    return normalize_events(TraceEvent(**event) for event in events)
 
 
-def ingest_decoded_mcap(path: Path) -> tuple[Frame, ...]:
-    raw = json.loads(path.read_text())
+def ingest_agent_trace(path: Path) -> tuple[Frame, ...]:
+    return ingest_agent_trace_data(json.loads(path.read_text()))
+
+
+def ingest_decoded_mcap_data(raw: Mapping[str, Any]) -> tuple[Frame, ...]:
     if raw.get("format") != "decoded-mcap-envelope-v1":
         raise ValueError(
             "raw binary MCAP is not supported in the dependency-free path; "
             "expected decoded-mcap-envelope-v1"
         )
+    messages = raw.get("messages")
+    if not isinstance(messages, list) or not messages:
+        raise ValueError("decoded MCAP envelope must contain at least one message")
     return normalize_events(
         TraceEvent(
             timestamp=message["log_time"],
@@ -107,8 +122,12 @@ def ingest_decoded_mcap(path: Path) -> tuple[Frame, ...]:
             reference=message["payload"].get("reference"),
             metadata={"scene": message["payload"].get("scene", {})},
         )
-        for message in raw["messages"]
+        for message in messages
     )
+
+
+def ingest_decoded_mcap(path: Path) -> tuple[Frame, ...]:
+    return ingest_decoded_mcap_data(json.loads(path.read_text()))
 
 
 def _pipeline_outputs(
@@ -177,6 +196,17 @@ def outcome(
     substitute: str | None = None,
     substitute_until: int | None = None,
 ) -> bool:
+    if not frames:
+        raise ValueError("counterfactual replay requires at least one frame")
+    marked_targets = {
+        frame.index for frame in frames if frame.scene.get("target_frame") is True
+    }
+    if not marked_targets:
+        if len(frames) != 1:
+            raise ValueError(
+                "multi-frame traces must mark at least one scene.target_frame"
+            )
+        marked_targets = {frames[0].index}
     target_commands: list[str] = []
     for frame in frames:
         active_substitute = substitute
@@ -193,7 +223,7 @@ def outcome(
         controller = planner
         if active_substitute == "control.controller":
             controller = planner
-        if frame.scene["target_frame"]:
+        if frame.index in marked_targets:
             target_commands.append(controller)
     return target_commands == ["grasp"]
 
@@ -329,8 +359,23 @@ def _checkpoint_passes(checkpoint: dict[str, Any], probe: dict[str, Any]) -> boo
     return float(checkpoint["behavior"]["adverse_light_recall"]) >= 0.5
 
 
-def bisect_checkpoints(registry: dict[str, Any]) -> dict[str, Any]:
-    checkpoints = registry["components"]["perception.detector"]["checkpoints"]
+def bisect_checkpoints(
+    registry: dict[str, Any], component: str = "perception.detector"
+) -> dict[str, Any]:
+    component_record = registry.get("components", {}).get(component)
+    if not component_record:
+        return {
+            "verdict": Verdict.UNDETERMINED.value,
+            "reason": f"checkpoint history is unavailable for {component}",
+            "evaluations": 0,
+        }
+    checkpoints = component_record.get("checkpoints", [])
+    if not checkpoints:
+        return {
+            "verdict": Verdict.UNDETERMINED.value,
+            "reason": f"checkpoint history is empty for {component}",
+            "evaluations": 0,
+        }
     probes = build_probe_set()
     low = 0
     high = len(checkpoints) - 1
@@ -429,25 +474,119 @@ def investigate_fixture(root: Path) -> dict[str, Any]:
     stack = load_stack(root / "demo" / "stack.yaml")
     registry = load_json_yaml(root / "demo" / "registry.yaml")
     frames = build_toy_frames()
-    component = attribute_component(frames, stack)
+    manifests = {
+        path.stem: load_json_yaml(path)
+        for path in (root / "demo" / "manifests").glob("*.json")
+    }
+    return investigate(
+        frames,
+        stack,
+        registry,
+        manifests,
+        execution_mode="live_reference_execution",
+        source="tabletop-low-light-v1",
+    )
+
+
+def investigate(
+    frames: tuple[Frame, ...],
+    stack: StackManifest,
+    registry: dict[str, Any],
+    manifests: Mapping[str, dict[str, Any]],
+    *,
+    execution_mode: str,
+    source: str,
+    seeds: int = 10,
+) -> dict[str, Any]:
+    """Run the complete supported descent over normalized evidence.
+
+    The built-in replay engine currently models the reference tabletop stack.
+    It re-executes downstream detector/planner/controller behavior; callers
+    must not present it as a generic ROS or arbitrary Python runtime.
+    """
+    if seeds < 1 or seeds > 10_000:
+        raise ValueError("seeds must be between 1 and 10000")
+    expected_actors = {
+        "perception.detector",
+        "planning.planner",
+        "control.controller",
+    }
+    actors = {item.actor for item in stack.components}
+    if actors != expected_actors:
+        raise ValueError(
+            "the built-in tabletop-reference-v1 engine requires exactly "
+            "perception.detector, planning.planner, and control.controller"
+        )
+    component = attribute_component(frames, stack, seeds=seeds)
+    evidence = {
+        "execution_mode": execution_mode,
+        "engine": "tabletop-reference-v1",
+        "source": source,
+        "frame_count": len(frames),
+        "stack": stack.name,
+        "stack_hash": canonical_hash(
+            {
+                "name": stack.name,
+                "determinism_score": stack.determinism_score,
+                "components": [asdict(item) for item in stack.components],
+            }
+        ),
+        "registry_hash": canonical_hash(registry),
+        "seeds": seeds,
+    }
     if component["verdict"] != Verdict.ATTRIBUTED.value:
-        return {"component": component, "checkpoint": None, "data": None}
+        return {
+            "schema": "culprit-finding-v1",
+            "fixture": source,
+            "status": Verdict.UNATTRIBUTED.value,
+            "component": component,
+            "decisive_step": None,
+            "checkpoint": None,
+            "data": None,
+            "evidence": evidence,
+            "limits": {
+                "external_benchmark": False,
+                "raw_mcap": False,
+                "tier3_tda": False,
+            },
+        }
     step = decisive_step_bisect(frames, component["component"])
-    checkpoint = bisect_checkpoints(registry)
+    checkpoint = bisect_checkpoints(registry, component["component"])
     if checkpoint["verdict"] != "REGRESSION_FOUND":
         return {
+            "schema": "culprit-finding-v1",
+            "fixture": source,
+            "status": Verdict.UNDETERMINED.value,
             "component": component,
             "decisive_step": step,
             "checkpoint": checkpoint,
             "data": None,
+            "evidence": evidence,
+            "limits": {
+                "external_benchmark": False,
+                "raw_mcap": False,
+                "tier3_tda": False,
+            },
         }
-    previous_manifest = load_json_yaml(
-        root / "demo" / "manifests" / f"{checkpoint['previous']}.json"
-    )
-    current_manifest = load_json_yaml(
-        root / "demo" / "manifests" / f"{checkpoint['current']}.json"
-    )
-    data = audit_data(previous_manifest, current_manifest, checkpoint)
+    previous_manifest = manifests.get(checkpoint["previous"])
+    current_manifest = manifests.get(checkpoint["current"])
+    if previous_manifest is None or current_manifest is None:
+        missing = [
+            checkpoint_id
+            for checkpoint_id, manifest in (
+                (checkpoint["previous"], previous_manifest),
+                (checkpoint["current"], current_manifest),
+            )
+            if manifest is None
+        ]
+        data = {
+            "verdict": Verdict.UNDETERMINED.value,
+            "reason": "training manifests are unavailable: " + ", ".join(missing),
+            "manifest_diff": None,
+            "tier": 0,
+        }
+    else:
+        data = audit_data(previous_manifest, current_manifest, checkpoint)
     # Internal records are useful for computation but overly noisy in reports.
     checkpoint_public = {
         key: value
@@ -456,11 +595,17 @@ def investigate_fixture(root: Path) -> dict[str, Any]:
     }
     return {
         "schema": "culprit-finding-v1",
-        "fixture": "tabletop-low-light-v1",
+        "fixture": source,
+        "status": (
+            Verdict.ATTRIBUTED.value
+            if data["verdict"] != Verdict.UNDETERMINED.value
+            else Verdict.UNDETERMINED.value
+        ),
         "component": component,
         "decisive_step": step,
         "checkpoint": checkpoint_public,
         "data": data,
+        "evidence": evidence,
         "limits": {
             "external_benchmark": False,
             "raw_mcap": False,

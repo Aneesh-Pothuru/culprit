@@ -1,7 +1,7 @@
 PYTHON ?= python3
 PYTHONPATH := src
 
-.PHONY: demo test lint reproduce-benchmark reproduce-counterfactuals
+.PHONY: demo test lint reproduce-benchmark reproduce-counterfactuals service-check
 
 demo:
 	@PYTHONPATH=$(PYTHONPATH) $(PYTHON) -m culprit demo
@@ -21,3 +21,5 @@ reproduce-benchmark:
 reproduce-counterfactuals:
 	@PYTHONPATH=$(PYTHONPATH) $(PYTHON) -m culprit reproduce-counterfactuals
 
+service-check:
+	@PYTHONPATH=$(PYTHONPATH) $(PYTHON) -m unittest tests.test_enterprise -v

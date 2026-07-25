@@ -283,11 +283,22 @@
     "timestamp": 0.7,
     "verdict": "ATTRIBUTED"
   },
+  "evidence": {
+    "engine": "tabletop-reference-v1",
+    "execution_mode": "live_reference_execution",
+    "frame_count": 12,
+    "registry_hash": "sha256:60d608db701e606cebc1c6e919f5b665770b52516dceb2ba64d2ad5724f82b77",
+    "seeds": 10,
+    "source": "tabletop-low-light-v1",
+    "stack": "tabletop-v1",
+    "stack_hash": "sha256:8f67baa674f4fcf7e192fd02a1b87c6b4a86759ac9c3eccab5ebf41e9df467a2"
+  },
   "fixture": "tabletop-low-light-v1",
   "limits": {
     "external_benchmark": false,
     "raw_mcap": false,
     "tier3_tda": false
   },
-  "schema": "culprit-finding-v1"
+  "schema": "culprit-finding-v1",
+  "status": "ATTRIBUTED"
 }

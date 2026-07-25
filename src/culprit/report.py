@@ -11,6 +11,13 @@ def write_finding(path: Path, finding: dict[str, Any]) -> None:
     path.with_name("finding.json").write_text(
         json.dumps(finding, indent=2, sort_keys=True) + "\n"
     )
+    if (
+        finding.get("status") != "ATTRIBUTED"
+        or not finding.get("checkpoint")
+        or not finding.get("data")
+    ):
+        _write_incomplete_finding(path, finding)
+        return
     component = finding["component"]
     step = finding["decisive_step"]
     checkpoint = finding["checkpoint"]
@@ -137,4 +144,67 @@ and tier-3 TDA claims are not made. See LIMITS.md.</div>
 </main>
 </body></html>
 """
+    path.write_text(document)
+
+
+def _write_incomplete_finding(path: Path, finding: dict[str, Any]) -> None:
+    component = finding.get("component") or {}
+    status = str(finding.get("status", "UNDETERMINED"))
+    reason = component.get("reason")
+    if finding.get("checkpoint") and finding["checkpoint"].get("reason"):
+        reason = finding["checkpoint"]["reason"]
+    if finding.get("data") and finding["data"].get("reason"):
+        reason = finding["data"]["reason"]
+    reason = str(reason or "available evidence does not support an attribution")
+    trials = component.get("counterfactuals", [])
+    rows = "".join(
+        "<tr><td>{}</td><td>{}/{}</td><td>{:.0%}</td></tr>".format(
+            html.escape(str(item.get("actor", "unknown"))),
+            item.get("outcome_flips", 0),
+            item.get("seeds", 0),
+            float(item.get("flip_rate", 0)),
+        )
+        for item in trials
+    )
+    if not rows:
+        rows = "<tr><td colspan='3'>No counterfactual trials completed.</td></tr>"
+    evidence = finding.get("evidence") or {}
+    execution_mode = html.escape(str(evidence.get("execution_mode", "unknown")))
+    source = html.escape(str(evidence.get("source", "unknown")))
+    document = """<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CULPRIT — {status}</title>
+<style>
+:root{{--bg:#090a09;--panel:#141512;--paper:#e1dccf;--muted:#918e84;
+--line:#34352f;--amber:#ffb000;--cyan:#71d5d0}}
+*{{box-sizing:border-box}}body{{margin:0;color:var(--paper);background:var(--bg);
+font:15px/1.55 Inter,system-ui,sans-serif}}main{{max-width:980px;margin:auto;padding:8vw 24px}}
+.eyebrow{{color:var(--amber);font:800 10px ui-monospace,monospace;
+letter-spacing:.14em;text-transform:uppercase}}h1{{margin:.2em 0;font-size:clamp(48px,8vw,100px);
+line-height:.85;letter-spacing:-.065em}}.lede{{max-width:720px;color:#c0bbae;font-size:19px}}
+.boundary{{margin:38px 0;padding:22px;border:1px solid #795916;background:#211a0b}}
+.boundary strong{{color:var(--amber)}}.facts{{display:grid;grid-template-columns:1fr 1fr;
+gap:1px;background:var(--line);border:1px solid var(--line)}}.facts div{{padding:17px;
+background:var(--panel)}}.facts span{{display:block;color:var(--muted);
+font:700 9px ui-monospace,monospace;text-transform:uppercase}}.facts b{{display:block;
+margin-top:7px}}table{{width:100%;margin-top:28px;border-collapse:collapse;background:var(--panel)}}
+th,td{{padding:13px;text-align:left;border:1px solid var(--line)}}th{{color:var(--muted);
+font:700 9px ui-monospace,monospace;text-transform:uppercase}}@media(max-width:600px){{
+.facts{{grid-template-columns:1fr}}}}
+</style></head><body><main><p class="eyebrow">Evidence-preserving stop</p>
+<h1>{status}</h1><p class="lede">{reason}</p>
+<div class="boundary"><strong>No causal claim was issued.</strong> Missing or
+non-flipping evidence remains visible so absence of proof cannot be presented
+as a pass.</div><div class="facts"><div><span>Execution mode</span><b>{mode}</b></div>
+<div><span>Evidence source</span><b>{source}</b></div></div>
+<table><thead><tr><th>Substitution</th><th>Outcome flips</th><th>Flip rate</th>
+</tr></thead><tbody>{rows}</tbody></table></main></body></html>
+""".format(
+        status=html.escape(status),
+        reason=html.escape(reason),
+        mode=execution_mode,
+        source=source,
+        rows=rows,
+    )
     path.write_text(document)
