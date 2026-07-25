@@ -16,10 +16,13 @@ def write_finding(path: Path, finding: dict[str, Any]) -> None:
     checkpoint = finding["checkpoint"]
     data = finding["data"]
     counterfactual_rows = "\n".join(
-        "<tr><td>{}</td><td>{}/{}</td><td>{:.0%}</td></tr>".format(
+        "<tr><td><span class='actor-dot'></span>{}</td><td>{}/{}</td>"
+        "<td><div class='mini-track'><i style='width:{:.0%}'></i></div></td>"
+        "<td>{:.0%}</td></tr>".format(
             html.escape(item["actor"]),
             item["successes"],
             item["seeds"],
+            item["flip_rate"],
             item["flip_rate"],
         )
         for item in component["counterfactuals"]
@@ -30,36 +33,108 @@ def write_finding(path: Path, finding: dict[str, Any]) -> None:
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>CULPRIT — three-stage finding</title>
 <style>
-body{{font:16px/1.5 system-ui;max-width:980px;margin:3rem auto;padding:0 1rem;color:#19212b}}
-.stage{{border-left:5px solid #8b1e2d;padding:1rem 1.4rem;margin:1.5rem 0;background:#f7f8fa}}
-.verdict{{font-weight:800;color:#8b1e2d}} table{{border-collapse:collapse;width:100%}}
-th,td{{padding:.45rem;border-bottom:1px solid #ddd;text-align:left}} code{{font-size:.85rem}}
-</style></head><body>
-<p>CULPRIT / deterministic tabletop investigation</p>
-<h1>One failure, three evidenced verdicts</h1>
-<section class="stage"><h2>1 · Component</h2>
+:root{{--bg:#090b0d;--panel:#111519;--panel-2:#171c21;--line:#2a3238;
+--text:#f7f7f3;--muted:#99a1a6;--faint:#626c72;--amber:#f4bd6a;--red:#ff766f;
+--cyan:#65d4de;--green:#6ee0a0;--shadow:0 26px 76px rgba(0,0,0,.44)}}
+*{{box-sizing:border-box}}html{{scroll-behavior:smooth}}body{{margin:0;color:var(--text);
+background:radial-gradient(circle at 78% -8%,rgba(244,189,106,.15),transparent 31rem),
+linear-gradient(115deg,rgba(255,118,111,.025),transparent 35%),var(--bg);
+font:14px/1.55 Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}}
+.topbar{{height:58px;padding:0 26px;display:flex;align-items:center;justify-content:space-between;
+border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10;background:rgba(9,11,13,.88);
+backdrop-filter:blur(16px)}}.brand{{display:flex;align-items:center;gap:11px;font-weight:780}}
+.brand-mark{{width:27px;height:27px;border-radius:8px;display:grid;place-items:center;
+background:linear-gradient(145deg,var(--amber),#ef7f59);color:#160e08;
+box-shadow:0 0 24px rgba(244,189,106,.24)}}.topmeta{{display:flex;align-items:center;gap:14px;
+color:var(--muted);font:10px ui-monospace,monospace;text-transform:uppercase;letter-spacing:.11em}}
+.proven{{display:flex;gap:7px;align-items:center;color:#aef0c9}}.proven:before{{content:"";
+width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 12px var(--green)}}
+main{{max-width:1320px;margin:auto;padding:30px 26px 64px}}.hero{{border:1px solid var(--line);
+border-radius:18px;background:linear-gradient(145deg,rgba(23,28,33,.98),rgba(11,14,17,.98));
+box-shadow:var(--shadow);overflow:hidden}}.hero-copy{{padding:36px 38px}}.eyebrow,.section-label{{
+margin:0 0 13px;color:var(--amber);font:750 10px ui-monospace,monospace;text-transform:uppercase;
+letter-spacing:.16em}}.eyebrow:before{{content:"";display:inline-block;width:24px;height:1px;
+background:currentColor;vertical-align:middle;margin-right:9px}}h1{{font-size:clamp(38px,5vw,66px);
+line-height:.98;letter-spacing:-.05em;margin:0}}.lede{{font-size:17px;color:#bbc1c4;
+max-width:760px;margin:20px 0 0}}.moment{{display:grid;grid-template-columns:auto minmax(0,1fr) auto;
+gap:16px;align-items:center;border-top:1px solid var(--line);padding:17px 38px;
+background:rgba(7,9,11,.3)}}.moment span{{color:var(--muted);font:10px ui-monospace,monospace;
+text-transform:uppercase;letter-spacing:.1em}}.time-track{{height:2px;background:var(--line);
+position:relative}}.time-track:before{{content:"";position:absolute;left:0;top:0;width:62%;height:100%;
+background:linear-gradient(90deg,var(--cyan),var(--red))}}.time-track:after{{content:"";
+position:absolute;left:62%;top:50%;width:10px;height:10px;border:2px solid #161b20;border-radius:50%;
+background:var(--red);transform:translate(-50%,-50%);box-shadow:0 0 15px var(--red)}}
+.descent{{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:17px 0;
+position:relative}}.descent:before{{content:"";position:absolute;left:12%;right:12%;top:47px;
+height:1px;background:linear-gradient(90deg,var(--cyan),var(--amber),var(--red));z-index:0}}
+.stage{{position:relative;z-index:1;border:1px solid var(--line);border-radius:15px;
+background:linear-gradient(180deg,rgba(18,22,26,.98),rgba(11,14,17,.98));padding:18px;
+min-height:210px}}.stage-index{{width:32px;height:32px;border:1px solid var(--line);border-radius:10px;
+display:grid;place-items:center;background:#0b0e11;color:var(--amber);font:750 10px
+ui-monospace,monospace}}.stage h2{{font-size:12px;text-transform:uppercase;letter-spacing:.11em;
+color:var(--muted);margin:24px 0 8px}}.verdict{{font-size:25px;line-height:1.05;font-weight:780;
+letter-spacing:-.035em;margin:0;color:#fff}}.verdict.red{{color:#ff9b96}}.stage p:last-child{{
+color:var(--muted);margin-bottom:0}}.workspace{{display:grid;grid-template-columns:minmax(0,1.25fr)
+minmax(300px,.75fr);gap:14px}}.panel{{border:1px solid var(--line);border-radius:15px;
+background:linear-gradient(180deg,rgba(18,22,26,.98),rgba(10,13,16,.98));overflow:hidden}}
+.panel-head{{padding:18px 20px;border-bottom:1px solid var(--line);display:flex;align-items:end;
+justify-content:space-between;gap:16px}}.panel-head h2{{margin:0;font-size:21px}}.panel-head span{{
+color:var(--muted);font-size:11px}}.scroll{{overflow:auto}}table{{border-collapse:collapse;width:100%;
+font-size:12px}}th,td{{text-align:left;padding:11px 13px;border-bottom:1px solid var(--line)}}
+th{{color:var(--faint);font:700 9px ui-monospace,monospace;text-transform:uppercase;
+letter-spacing:.1em;background:#151a1f}}.actor-dot{{display:inline-block;width:6px;height:6px;
+border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan);margin-right:8px}}
+.mini-track{{width:110px;height:7px;background:#090b0d;border:1px solid var(--line);
+border-radius:99px;overflow:hidden}}.mini-track i{{display:block;height:100%;background:linear-gradient(
+90deg,var(--cyan),var(--green))}}.evidence-list{{padding:9px 20px 20px}}.evidence-row{{display:grid;
+grid-template-columns:1fr auto;gap:18px;padding:13px 0;border-bottom:1px solid var(--line)}}
+.evidence-row:last-child{{border-bottom:0}}.evidence-row span{{color:var(--muted)}}
+.evidence-row strong{{font:750 11px ui-monospace,monospace}}.scope{{margin-top:14px;
+border:1px solid #493b27;border-radius:13px;background:#1c1710;padding:16px 18px;color:#c7bda8;
+font-size:12px}}.scope strong{{color:var(--amber)}}@media(max-width:900px){{.descent,
+.workspace{{grid-template-columns:1fr}}.descent:before{{display:none}}}}@media(max-width:650px){{
+.topbar{{padding:0 14px}}.topmeta>span:first-child{{display:none}}main{{padding:18px 14px 42px}}
+.hero-copy{{padding:24px 20px}}.moment{{padding:16px 20px;grid-template-columns:1fr}}
+.time-track{{order:3}}}}
+</style></head><body><header class="topbar"><div class="brand"><span class="brand-mark">C</span>
+CULPRIT</div><div class="topmeta"><span>forensic replay / incident 004</span>
+<span class="proven">cause evidenced</span></div></header><main>
+<section class="hero"><div class="hero-copy"><p class="eyebrow">Counterfactual investigation · Journey 0</p>
+<h1>One failure. Three evidenced verdicts.</h1><p class="lede">The system descends
+from symptom to component, checkpoint, and training-data change. Confidence comes
+from what re-ran—not from what a model asserted.</p></div><div class="moment">
+<span>run start · 0.0s</span><div class="time-track" aria-label="Decisive moment on replay timeline"></div>
+<span>decisive frame {step["frame"]} · {step["timestamp"]:.1f}s</span></div></section>
+<section class="descent" aria-label="Causal descent">
+<article class="stage"><span class="stage-index">01</span><h2>Responsible component</h2>
 <p class="verdict">{html.escape(component["component"])}</p>
-<p>Confidence {component["confidence"]:.0%}; decisive frame {step["frame"]}
-at t={step["timestamp"]:.1f}s, found in {step["replays"]} replays.</p>
-<p>Ruled out: {", ".join(component["ruled_out"])}</p>
-<table><thead><tr><th>Substitution</th><th>Successes</th><th>Outcome flips</th></tr></thead>
-<tbody>{counterfactual_rows}</tbody></table></section>
-<section class="stage"><h2>2 · Checkpoint</h2>
-<p class="verdict">{checkpoint["previous"]} → {checkpoint["current"]}</p>
-<p>Rollback confirmed: {str(checkpoint["rollback_confirmed"]).lower()}.
-Binary-search evaluations: {checkpoint["evaluations"]}. Regression set:
-{len(regression_set)} cases; controls: {checkpoint["control_count"]}.</p></section>
-<section class="stage"><h2>3 · Data</h2>
-<p class="verdict">{data["verdict"]}</p><p>{html.escape(data["reason"])}</p>
-<p>Low-light share:
-{data["manifest_diff"]["previous_low_light_share"]:.1%} →
-{data["manifest_diff"]["current_low_light_share"]:.1%}; regression set
-{data["manifest_diff"]["regression_set_low_light_share"]:.1%} low-light.</p></section>
-<h2>Scope</h2>
-<p>This report is generated from a synthetic deterministic fixture. Raw MCAP,
-Who&amp;When, public checkpoint, and tier-3 TDA claims are not made. See
-LIMITS.md.</p>
+<p>{component["confidence"]:.0%} confidence · {step["replays"]} decisive replays ·
+ruled out {", ".join(component["ruled_out"])}</p></article>
+<article class="stage"><span class="stage-index">02</span><h2>Regressing transition</h2>
+<p class="verdict red">{checkpoint["previous"]} → {checkpoint["current"]}</p>
+<p>{checkpoint["evaluations"]} binary-search evaluations · rollback
+{str(checkpoint["rollback_confirmed"]).lower()} · {len(regression_set)} regression cases</p></article>
+<article class="stage"><span class="stage-index">03</span><h2>Training-data change</h2>
+<p class="verdict">{data["verdict"]}</p><p>{html.escape(data["reason"])}</p></article>
+</section><section class="workspace"><article class="panel"><div class="panel-head"><div>
+<p class="section-label">Outcome-flip evidence</p><h2>Counterfactual replay</h2></div>
+<span>ground-truth substitution</span></div><div class="scroll"><table>
+<thead><tr><th>Substitution</th><th>Successes</th><th>Flip signal</th><th>Outcome flips</th></tr>
+</thead><tbody>{counterfactual_rows}</tbody></table></div></article><aside class="panel">
+<div class="panel-head"><div><p class="section-label">Manifest evidence</p>
+<h2>Slice audit</h2></div></div><div class="evidence-list">
+<div class="evidence-row"><span>Previous low-light share</span>
+<strong>{data["manifest_diff"]["previous_low_light_share"]:.1%}</strong></div>
+<div class="evidence-row"><span>Current low-light share</span>
+<strong>{data["manifest_diff"]["current_low_light_share"]:.1%}</strong></div>
+<div class="evidence-row"><span>Regression-set low-light</span>
+<strong>{data["manifest_diff"]["regression_set_low_light_share"]:.1%}</strong></div>
+<div class="evidence-row"><span>Unrelated controls</span>
+<strong>{checkpoint["control_count"]}</strong></div></div></aside></section>
+<div class="scope"><strong>Scope boundary · </strong>This report is generated
+from a synthetic deterministic fixture. Raw MCAP, Who&amp;When, public checkpoint,
+and tier-3 TDA claims are not made. See LIMITS.md.</div>
+</main>
 </body></html>
 """
     path.write_text(document)
-
